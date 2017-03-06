@@ -33,6 +33,7 @@ class Client
         msg = JSON.parse(@server.gets.chomp)
         if msg[0] == 'MSG'
           puts msg[1]
+        end
       }
     end
   end
@@ -54,5 +55,5 @@ end
 
 
 
-server = TCPSocket.open( "localhost", 3000 )
+server = TCPSocket.open( "10.10.10.145", 3000 )
 Client.new( server )

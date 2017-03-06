@@ -72,7 +72,7 @@ class ChatServer
         if msg.length == 2
           @clients.each do |other_name, other_client|
             unless other_name == username
-              other_client.puts ["MSG", "#{username.to_s}: #{msg}"].to_json
+              other_client.puts ["MSG", "#{username.to_s}: #{msg[0]}"].to_json
             end
           end
         end
