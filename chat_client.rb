@@ -30,8 +30,9 @@ class Client
   def listen
     @response = Thread.new do
       loop {
-        msg = @server.gets.chomp
-        puts "#{msg}"
+        msg = JSON.parse(@server.gets.chomp)
+        if msg[0] == 'MSG'
+          puts msg[1]
       }
     end
   end
@@ -40,7 +41,11 @@ class Client
     @request = Thread.new do
       loop {
         msg = $stdin.gets.chomp.split
-        request = [msg[0], msg[1], msg[2] ].to_json
+        command = msg.first
+        if command == 'MSG'
+          msg = msg.slice(1, msg.length-1).join(' ')
+        end
+        request = [command, msg].to_json
         @server.puts( request )
       }
     end

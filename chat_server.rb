@@ -16,43 +16,49 @@ class ChatServer
       Thread.start(@serverSocket.accept) do | client |
         net_data = JSON.parse(client.gets)
         # exit if login/registration doesn't have 3 args
+
         if net_data.length != 3 then
-          client.puts("Illegal input. exiting.\n")
+          client.puts([0xFF].to_json)
           Thread.kill self
         end
-
-        command = net_data[0]
-        username = net_data[1]
-        password = net_data[2]
+        command = net_data[0].chomp
+        username = net_data[1].chomp
+        password = net_data[2].chomp
         usercheck = check_username(username)
+        puts "hello"
         # if user is registering, search user.csv for a username match
         if command == 'REGISTER' then
+          puts "registering"
           if (usercheck[0]) then # username in use, reject registration
-            client.puts("Username already in use. Registration rejected.\n")
+            client.puts([0x02].to_json)
             Thread.kill self
           else # username is unique, save the new entry, log user in
             new_entry = sprintf("%s,%s\n", username, password)
-            File.write('users.csv', "a+").write(new_entry)
+            File.open('users.csv', "a+").write(new_entry)
           end
         elsif command == 'LOGIN' then
           puts usercheck[1].eql? password
           if !usercheck[0] || password != usercheck[1].chomp
-            client.puts("incorrect username or password\n")
+            client.puts([0x01].to_json)
             Thread.kill self
           end
         end
         @clients[username] = client
-        client.puts "Connection established."
+        client.puts [0x00].to_json
         listen_user_messages( username, client )
       end
     }.join
   end
 
   def check_username( username )
-    File.open('users.csv').each_line do | line |
-      reg_user = line.split(",")
-      if reg_user[0] == username
-        return [true, reg_user[1]]
+    puts "in check_username"
+    if File.file? './users.csv'
+      puts 'file found'
+      File.open('./users.csv').each_line do | line |
+        reg_user = line.split(",")
+        if reg_user[0] == username
+          return [true, reg_user[1]]
+        end
       end
     end
     return [false]
@@ -60,12 +66,22 @@ class ChatServer
 
   def listen_user_messages( username, client )
     loop {
-      msg = client.gets.chomp
-      puts "#{username.to_s}: #{msg}"
-      @clients.each do |other_name, other_client|
-        unless other_name == username
-          other_client.puts "#{username.to_s}: #{msg}"
+      msg = JSON.parse(client.gets.chomp)
+      command = msg[0]
+      if command == 'MSG'
+        if msg.length == 2
+          @clients.each do |other_name, other_client|
+            unless other_name == username
+              other_client.puts ["MSG", "#{username.to_s}: #{msg}"].to_json
+            end
+          end
         end
+      elsif command == 'DISCONNECT'
+        @clients.remove client
+      elsif command == 'CLIST'
+        client.puts [0x00, @clients.keys].to_json
+      else # catchall for wrong format
+        client.puts [0xFF].to_json
       end
 
     }
