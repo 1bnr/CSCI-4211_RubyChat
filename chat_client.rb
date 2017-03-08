@@ -47,6 +47,7 @@ class Client
           msg = msg.slice(1, msg.length-1).join(' ')
         end
         request = [command, msg].to_json
+        puts request.inspect
         @server.puts( request )
       }
     end

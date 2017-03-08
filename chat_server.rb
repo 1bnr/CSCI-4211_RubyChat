@@ -35,12 +35,14 @@ class ChatServer
           else # username is unique, save the new entry, log user in
             new_entry = sprintf("%s,%s\n", username, password)
             File.open('users.csv', "a+").write(new_entry)
+            @clients[username] = client
           end
         elsif command == 'LOGIN' then
-          puts usercheck[1].eql? password
           if !usercheck[0] || password != usercheck[1].chomp
             client.puts([0x01].to_json)
             Thread.kill self
+          else
+            @clients[username] = client
           end
         end
         @clients[username] = client
