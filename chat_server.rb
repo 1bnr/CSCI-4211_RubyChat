@@ -90,4 +90,9 @@ class ChatServer
   end
 
 end
-ChatServer.new( 3000, "localhost" )
+
+if ARGV.length != 2 then
+  puts "Usage: chat_server <port_num> <ip_address>\n"
+else
+  ChatServer.new( ARGV[0].to_i, ARGV[1] )
+end

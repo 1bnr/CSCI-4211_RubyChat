@@ -2,7 +2,8 @@
 require "socket"
 require "json"
 class Client
-  def initialize( server )
+  def initialize( port_num, ip_address )
+    TCPSocket.open( ip_address, port_num )
     puts "Client is not connected."
     request = [nil, nil, nil]
     loop do
@@ -56,5 +57,8 @@ end
 
 
 
-server = TCPSocket.open( "10.10.10.145", 3000 )
-Client.new( server )
+if ARGV.length != 2 then
+  puts "Usage: chat_server <port_num> <ip_address>\n"
+else
+  Client.new( ARGV[0].to_i, ARGV[1] )
+end
