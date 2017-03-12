@@ -25,10 +25,8 @@ class ChatServer
         username = net_data[1].chomp
         password = net_data[2].chomp
         usercheck = check_username(username)
-        puts "hello"
         # if user is registering, search user.csv for a username match
         if command == 'REGISTER' then
-          puts "registering"
           if (usercheck[0]) then # username in use, reject registration
             client.puts([0x02].to_json)
             Thread.kill self
@@ -70,18 +68,19 @@ class ChatServer
     loop {
       msg = JSON.parse(client.gets.chomp)
       command = msg[0]
-      if command == 'MSG'
-        if msg.length == 2
-          @clients.each do |other_name, other_client|
-            unless other_name == username
-              other_client.puts ["MSG", "#{username.to_s}: #{msg[0]}"].to_json
-            end
+      if command == 'MSG' && msg.length <= 2
+        @clients.each do |other_name, other_client|
+          unless other_name == username
+            other_client.puts ["MSG", "#{username.to_s}: #{msg[1]}"].to_json
           end
         end
+        client.puts ["0x00"].to_json
+      end
       elsif command == 'DISCONNECT'
         @clients.remove client
       elsif command == 'CLIST'
-        client.puts [0x00, @clients.keys].to_json
+        client.puts [0x00].to_json
+        client.puts ["CLIST", @clients.keys].to_json
       else # catchall for wrong format
         client.puts [0xFF].to_json
       end
