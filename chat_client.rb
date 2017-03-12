@@ -34,6 +34,17 @@ class Client
         msg = JSON.parse(@server.gets.chomp)
         if msg[0] == 'MSG'
           puts msg[1]
+        elsif msg[0] == 'CLIST'
+          list = msg[1].pop
+          loop do
+            if msg.empty?
+              break
+            else
+              list.concat ", "
+              list.concat msg.pop
+            end
+          end
+
         end
       }
     end
