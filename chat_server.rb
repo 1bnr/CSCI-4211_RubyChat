@@ -75,8 +75,10 @@ class ChatServer
           end
         end
         client.puts ["0x00"].to_json
-      
+
       elsif command == 'DISCONNECT'
+        client.puts ["0x00"].to_json
+        client.puts ["DISCONNECT"].to_json
         @clients.remove client
       elsif command == 'CLIST'
         client.puts [0x00].to_json

@@ -44,7 +44,8 @@ class Client
               list.concat msg.pop
             end
           end
-
+        elsif msg[0] == "DISCONNECT"
+          exit 0
         end
       }
     end
