@@ -3,17 +3,17 @@ require "socket"
 require "json"
 class Client
   def initialize( port_num, ip_address )
-    TCPSocket.open( ip_address, port_num )
+    server = TCPSocket.open( ip_address, port_num )
     puts "Client is not connected."
     request = [nil, nil, nil]
     loop do
       puts "to register a new account:\n\tREGISTER <username> <password>\nto login:\n\tLOGIN <username> <password>\n"
       msg = $stdin.gets.chomp.split
-      request = [msg[0], msg[1], msg[2] ].to_json
       if msg.length != 3 then
         msg[0] = "HELP"
       end
-      if msg[0] != 'HELP' && (msg[0] != 'REGISTER' || msg[0] != 'LOGIN')
+      request = [msg[0], msg[1], msg[2] ].to_json
+      if (msg[0] == 'REGISTER' || msg[0] == 'LOGIN')
         break
       end
     end
