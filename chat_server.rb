@@ -51,9 +51,7 @@ class ChatServer
   end
 
   def check_username( username )
-    puts "in check_username"
     if File.file? './users.csv'
-      puts 'file found'
       File.open('./users.csv').each_line do | line |
         reg_user = line.split(",")
         if reg_user[0] == username
