@@ -69,18 +69,16 @@ class ChatServer
       if command == 'MSG' && msg.length <= 2
         @clients.each do |other_name, other_client|
           unless other_name == username
-            other_client.puts ["MSG", "#{username.to_s}: #{msg[1]}"].to_json
+            other_client.puts ["#{username.to_s}: #{msg[1]}"].to_json
           end
         end
-        client.puts ["0x00"].to_json
+        client.puts [0x00, "Success"].to_json
 
       elsif command == 'DISCONNECT'
-        client.puts ["0x00"].to_json
-        client.puts ["DISCONNECT"].to_json
+        client.puts [0x00, "DISCONNECT"].to_json
         @clients.remove client
       elsif command == 'CLIST'
-        client.puts [0x00].to_json
-        client.puts ["CLIST", @clients.keys].to_json
+        client.puts [0x00, "CLIST", @clients.keys].to_json
       else # catchall for wrong format
         client.puts [0xFF].to_json
       end
